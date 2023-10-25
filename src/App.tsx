@@ -1,5 +1,5 @@
 import "./styles/App.scss";
-import { createTodo, getTodos, removeTodo, editTodo } from "../src/lib/api";
+import { createTodo, getTodos, removeTodo, editTodo } from "./lib/api/api";
 
 function App() {
   return (
