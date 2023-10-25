@@ -1,27 +1,24 @@
 import { formatDate } from "../util/formatDate";
+import axios from "axios";
 
-//todo 생성하기
-export async function createTodo(todo) {
+// todo 생성하기
+export async function createTodo(todo: string) {
   try {
-    const res = await fetch(
+    const response = await axios.post(
       "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
       {
-        method: "POST",
+        title: todo,
+      },
+      {
         headers: {
           "content-type": "application/json",
           apikey: "KDT5_nREmPe9B",
           username: "KDT5_LeeEunJi",
         },
-        body: JSON.stringify({
-          title: todo,
-        }),
       }
     );
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    const json = await res.json();
 
+    const json = response.data;
     const formattedCreatedAt = formatDate(json.createdAt);
     const formattedUpdatedAt = formatDate(json.updatedAt);
 
@@ -43,10 +40,10 @@ export async function createTodo(todo) {
   }
 }
 
-//todo List 가져오기
+// todo List 가져오기
 export async function getTodos() {
   try {
-    const res = await fetch(
+    const response = await axios.get(
       "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
       {
         headers: {
@@ -55,60 +52,55 @@ export async function getTodos() {
         },
       }
     );
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    const data = await res.json();
-    return data;
+
+    return response.data;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-//todo 삭제하기
-export async function removeTodo(id) {
+// todo 삭제하기
+export async function removeTodo(id: string) {
   try {
-    const res = await fetch(
+    await axios.delete(
       `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
       {
-        method: "DELETE",
         headers: {
           apikey: "KDT5_nREmPe9B",
           username: "KDT5_LeeEunJi",
         },
       }
     );
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-//todo 편집하기
-export async function editTodo(id, isDone, title) {
+// todo 편집하기
+interface TodoItem {
+  id: string;
+  isDone: boolean;
+  title: string;
+}
+
+export async function editTodo({ id, isDone, title }: TodoItem) {
   try {
-    const res = await fetch(
+    await axios.put(
       `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
       {
-        method: "PUT",
+        title: title ? title : editTitle,
+        done: isDone,
+      },
+      {
         headers: {
           "content-type": "application/json",
           apikey: "KDT5_nREmPe9B",
           username: "KDT5_LeeEunJi",
         },
-        body: JSON.stringify({
-          title: title ? title : editTitle,
-          done: isDone,
-        }),
       }
     );
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
   } catch (error) {
     console.error(error);
     throw error;
