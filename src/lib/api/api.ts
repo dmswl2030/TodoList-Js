@@ -1,34 +1,32 @@
 import { formatDate } from "../util/formatDate";
 import axios from "axios";
 
+const api = axios.create({
+  baseURL: "https://asia-northeast3-heropy-api.cloudfunctions.net/api",
+  headers: {
+    apikey: "KDT5_nREmPe9B",
+    username: "KDT5_LeeEunJi",
+  },
+});
+
 // todo 생성하기
 export async function createTodo(todo: string) {
   try {
-    const response = await axios.post(
-      "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
-      {
-        title: todo,
-      },
-      {
-        headers: {
-          "content-type": "application/json",
-          apikey: "KDT5_nREmPe9B",
-          username: "KDT5_LeeEunJi",
-        },
-      }
-    );
+    const response = await api.post("/todos", {
+      title: todo,
+    });
 
-    const json = response.data;
-    const formattedCreatedAt = formatDate(json.createdAt);
-    const formattedUpdatedAt = formatDate(json.updatedAt);
+    const data = response.data;
+    const formattedCreatedAt = formatDate(data.createdAt);
+    const formattedUpdatedAt = formatDate(data.updatedAt);
 
-    const id = json.id;
+    const id = data.id;
 
     const newTodo = {
       id,
-      order: json.order,
-      title: json.title,
-      done: json.done,
+      order: data.order,
+      title: data.title,
+      done: data.done,
       createdAt: formattedCreatedAt,
       updatedAt: formattedUpdatedAt,
     };
@@ -43,16 +41,7 @@ export async function createTodo(todo: string) {
 // todo List 가져오기
 export async function getTodos() {
   try {
-    const response = await axios.get(
-      "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
-      {
-        headers: {
-          apikey: "KDT5_nREmPe9B",
-          username: "KDT5_LeeEunJi",
-        },
-      }
-    );
-
+    const response = await api.get("/todos");
     return response.data;
   } catch (error) {
     console.error(error);
@@ -63,15 +52,7 @@ export async function getTodos() {
 // todo 삭제하기
 export async function removeTodo(id: string) {
   try {
-    await axios.delete(
-      `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
-      {
-        headers: {
-          apikey: "KDT5_nREmPe9B",
-          username: "KDT5_LeeEunJi",
-        },
-      }
-    );
+    await api.delete(`/todos/${id}`);
   } catch (error) {
     console.error(error);
     throw error;
@@ -87,20 +68,10 @@ interface TodoItem {
 
 export async function editTodo({ id, isDone, title }: TodoItem) {
   try {
-    await axios.put(
-      `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
-      {
-        title: title ? title : editTitle,
-        done: isDone,
-      },
-      {
-        headers: {
-          "content-type": "application/json",
-          apikey: "KDT5_nREmPe9B",
-          username: "KDT5_LeeEunJi",
-        },
-      }
-    );
+    await api.put(`/todos/${id}`, {
+      title: title ? title : editTitle,
+      done: isDone,
+    });
   } catch (error) {
     console.error(error);
     throw error;
