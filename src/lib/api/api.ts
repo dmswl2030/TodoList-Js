@@ -39,7 +39,7 @@ export async function createTodo(todo) {
     return newTodo;
   } catch (error) {
     console.error(error);
-    throw error; // Re-throw the error to handle it in the component
+    throw error;
   }
 }
 
