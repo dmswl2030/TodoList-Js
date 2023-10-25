@@ -1,12 +1,23 @@
 import { useQuery } from "react-query";
 import "./styles/App.scss";
-import { createTodo, getTodos, removeTodo, editTodo } from "./lib/api/api";
+import { getTodos } from "./lib/api/api";
 
+interface todoItem {
+  id: string;
+  title: string;
+  done: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
 function App() {
-  const { data, error, isLoading } = useQuery("allTodos", getTodos);
+  const { data } = useQuery("allTodos", getTodos);
+  console.log(data);
   return (
     <>
-      <div>{data}</div>
+      {data?.map((item: todoItem) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
     </>
   );
 }
