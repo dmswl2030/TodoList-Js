@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 import "./styles/App.scss";
-import { createTodo, getTodos } from "./lib/api/api";
+import { createTodo, getTodos, removeTodo } from "./lib/api/api";
 import { useState, useEffect } from "react";
 
 interface todoItem {
@@ -24,18 +24,29 @@ function App() {
     }
   }, [data]);
 
+  //추가 함수
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
     try {
       const newTodo = await createTodo(newTodoTitle);
-      console.log("새로운 ToDo가 생성되었습니다:", newTodo);
-      setTodos([newTodo, ...todos]); // 새로운 todo를 추가한 후 todos 상태 업데이트
+      setTodos([newTodo, ...todos]);
       setNewTodoTitle("");
     } catch (error) {
       console.error("ToDo 생성 중 오류 발생:", error);
     }
   };
+
+  //삭제 함수
+  const handleRemove = (todoId: string) => async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      await removeTodo(todoId);
+      setTodos(todos.filter((todo) => todo.id !== todoId));
+    } catch (error) {
+      console.error("ToDo 삭제 중 오류 발생:", error);
+    }
+  };
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -51,7 +62,7 @@ function App() {
         {todos?.map((item: todoItem) => (
           <li key={item.id} className="list__item">
             <p>{item.title}</p>
-            <button>삭제</button>
+            <button onClick={handleRemove(item.id)}>삭제</button>
             <button>수정</button>
           </li>
         ))}
