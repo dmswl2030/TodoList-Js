@@ -16,7 +16,11 @@ function App() {
   return (
     <>
       {data?.map((item: todoItem) => (
-        <li key={item.id}>{item.title}</li>
+        <li key={item.id} className="list__item">
+          <p>{item.title}</p>
+          <button>삭제</button>
+          <button>수정</button>
+        </li>
       ))}
     </>
   );
