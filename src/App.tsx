@@ -22,7 +22,7 @@ function App() {
   const { data } = useQuery("allTodos", getTodos);
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [todos, setTodos] = useState<todoItem[]>(data || []);
-  const [editMode, setEditMode] = useState(false);
+  const [editModes, setEditModes] = useState<{ [key: string]: boolean }>({});
   const [editedTitle, setEditedTitle] = useState("");
 
   console.log("todos", todos);
@@ -56,28 +56,24 @@ function App() {
     }
   };
 
-  //수정 함수
-  const handleEdit =
-    ({ todoId, isDone, title }: editItem) =>
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-
-      try {
-        await editTodo({ id: todoId, isDone, title: editedTitle || title });
-      } catch (error) {
-        console.error("ToDo 수정 중 오류 발생:", error);
-      }
-    };
-
   //수정모드로 전환
-  const enterEditMode = (title: string) => {
-    setEditMode(true);
-    setEditedTitle(title);
+  const toggleEditMode = (todoId: string) => {
+    setEditModes((prevModes) => ({
+      ...prevModes,
+      [todoId]: !prevModes[todoId],
+    }));
   };
 
-  const handleCancel = () => {
-    setEditMode(false);
+  //수정 함수
+  const handleEditSubmit = async ({ todoId, isDone, title }: editItem) => {
+    try {
+      await editTodo({ id: todoId, isDone, title: editedTitle || title });
+      toggleEditMode(todoId);
+    } catch (error) {
+      console.error("ToDo 수정 중 오류 발생:", error);
+    }
   };
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -93,7 +89,7 @@ function App() {
       <ul>
         {todos?.map((item: todoItem) => (
           <li key={item.id} className="list__item">
-            {editMode ? (
+            {editModes[item.id] ? (
               <>
                 <input
                   type="text"
@@ -102,7 +98,7 @@ function App() {
                 />
                 <button
                   onClick={() =>
-                    handleEdit({
+                    handleEditSubmit({
                       todoId: item.id,
                       isDone: item.done,
                       title: item.title,
@@ -111,13 +107,12 @@ function App() {
                 >
                   수정완료
                 </button>
-                <button onClick={handleCancel}>취소</button>
               </>
             ) : (
               <>
                 <p>{item.title}</p>
                 <button onClick={() => handleRemove(item.id)}>삭제</button>
-                <button onClick={() => enterEditMode(item.title)}>수정</button>
+                <button onClick={() => toggleEditMode(item.id)}>수정</button>
               </>
             )}
           </li>
