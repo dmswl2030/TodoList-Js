@@ -68,10 +68,12 @@ interface TodoItem {
 
 export async function editTodo({ id, isDone, title }: TodoItem) {
   try {
-    await api.put(`/todos/${id}`, {
-      title: title ? title : editTitle,
+    const data = {
       done: isDone,
-    });
+      title: title,
+    };
+
+    await api.put(`/todos/${id}`, data);
   } catch (error) {
     console.error(error);
     throw error;
